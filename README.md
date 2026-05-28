@@ -14,31 +14,31 @@ You know those sites like Spokeo, BeenVerified, and Whitepages that have your ho
 
 ---
 
-## The Easy Way (Web Interface)
+## The Easy Way (Web Interface - Docker)
 
 If you're not comfortable with command-line tools, Eraser has a visual interface that runs in your web browser.
 
 ### What You'll Need
 
-1. **Go** installed on your computer ([download here](https://go.dev/dl/))
+1. **Docker** installed on your computer ([download here](https://www.docker.com/products/docker-desktop/))
 2. A **Gmail account** to send emails from (with an App Password—setup instructions below)
 
 ### Getting Started
 
-**Step 1: Download Eraser**
+**Step 1: Download and Build the Docker Image**
 
 Open your terminal (on Mac, search for "Terminal"; on Windows, use PowerShell) and run:
 
 ```bash
-git clone https://github.com/eraser-privacy/eraser.git
+git clone https://github.com/knaps151/eraser-docker.git
 cd eraser
-go build -o eraser ./cmd/eraser
+docker build -t eraser .
 ```
 
 **Step 2: Start the Web Interface**
 
 ```bash
-./eraser serve
+docker run --rm -p 8080:8080 -v eraser-data:/home/eraser/.eraser eraser
 ```
 
 Open your browser and go to `http://localhost:8080`
@@ -78,10 +78,47 @@ That's the password you'll use in Eraser's setup wizard. Your regular Gmail pass
 
 If you prefer the command line, Eraser has a full CLI.
 
-### Installation
+### Installation (Docker)
 
 ```bash
-git clone https://github.com/eraser-privacy/eraser.git
+git clone https://github.com/knaps151/eraser-docker.git
+cd eraser
+docker build -t eraser .
+```
+
+Run CLI commands inside the container:
+
+```bash
+# Interactive setup
+docker run --rm -it -v eraser-data:/home/eraser/.eraser eraser init
+
+# Preview emails without sending
+docker run --rm -it -v eraser-data:/home/eraser/.eraser eraser send --dry-run
+
+# Send removal requests
+docker run --rm -it -v eraser-data:/home/eraser/.eraser eraser send
+
+# Show send history
+docker run --rm -it -v eraser-data:/home/eraser/.eraser eraser status
+```
+
+Start the web UI on `http://localhost:8080`:
+
+```bash
+docker run --rm -p 8080:8080 -v eraser-data:/home/eraser/.eraser eraser
+```
+
+Notes:
+- The Docker image includes `data/brokers.yaml`, so broker commands work out of the box.
+- Config and history are stored in `/home/eraser/.eraser`; mounting `eraser-data` keeps them between runs.
+- For browser automation (`fill`), use a local install since it requires a Chrome runtime and interactive browser access.
+
+### Installation (Local Go Alternative)
+
+If you prefer to run natively without Docker:
+
+```bash
+git clone https://github.com/knaps151/eraser-docker.git
 cd eraser
 go build -o eraser ./cmd/eraser
 ```
@@ -89,17 +126,17 @@ go build -o eraser ./cmd/eraser
 ### Quick Start
 
 ```bash
-# Interactive setup
-./eraser init
+# Interactive setup (Docker)
+docker run --rm -it -v eraser-data:/home/eraser/.eraser eraser init
 
 # Preview what would be sent (no emails go out)
-./eraser send --dry-run
+docker run --rm -it -v eraser-data:/home/eraser/.eraser eraser send --dry-run
 
 # Send removal requests to all brokers
-./eraser send
+docker run --rm -it -v eraser-data:/home/eraser/.eraser eraser send
 
 # Check your history
-./eraser status
+docker run --rm -it -v eraser-data:/home/eraser/.eraser eraser status
 ```
 
 ### Commands
@@ -272,6 +309,17 @@ Contributions are welcome. The most helpful things:
 - **Template improvements** — Better wording for removal requests
 - **Bug fixes** — Found something broken? PRs welcome
 - **Documentation** — Typos, clarifications, better examples
+
+---
+
+## Credits
+
+Full credit for Eraser goes to the original developers and maintainers of the upstream project:
+
+- The [Eraser Privacy team](https://github.com/eraser-privacy)
+- [@digisamroc](https://github.com/digisamroc), original author and core maintainer
+
+This repository builds on their work. Please support and star the original project.
 
 ---
 
