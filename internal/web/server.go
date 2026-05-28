@@ -266,7 +266,8 @@ func (s *Server) Start() error {
 	router := s.setupRouter()
 
 	s.httpServer = &http.Server{
-		Addr:         fmt.Sprintf("127.0.0.1:%d", s.port),
+		// Bind all interfaces so the UI is reachable when running in Docker.
+		Addr:         fmt.Sprintf("0.0.0.0:%d", s.port),
 		Handler:      router,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
